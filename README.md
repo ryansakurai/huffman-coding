@@ -6,4 +6,4 @@ This program reads a text until EOF, generates the Huffman Tree, using an auxili
 
 Both the Heap and the Huffman Tree are implemented.
 
-![imagem](https://github.com/ryansakurai/HuffmanCoding/blob/main/images/img.png)
+![image](https://github.com/ryansakurai/huffman-coding/blob/main/images/img.png)
