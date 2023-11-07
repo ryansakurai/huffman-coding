@@ -6,4 +6,4 @@ This program reads a text until EOF, generates the Huffman Tree, using an auxili
 
 Both the Heap and the Huffman Tree are implemented.
 
-![image](img/execution.png)
+![image](readme-assets/execution.png)
