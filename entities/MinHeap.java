@@ -31,6 +31,59 @@ public class MinHeap {
 	HuffmanTree.Node getMinNode() {
 		return array.get(0);
 	}
+
+	private class ItemPointer {
+		private int idx;
+		private int parentIdx;
+		private int leftChildIdx;
+		private int rightChildIdx;
+
+		private void updateRelatives() {
+			this.parentIdx = (idx-1)/2;
+			this.leftChildIdx = idx*2 + 1;
+			this.rightChildIdx = idx*2 + 2;
+		}
+
+		public ItemPointer(int idx) {
+			this.idx = idx;
+			updateRelatives();
+		}
+
+		public void setIdx(int idx) {
+			this.idx = idx;
+			updateRelatives();
+		}
+
+		public int getIdx() {
+			return idx;
+		}
+
+		public int getParentIdx() {
+			return parentIdx;
+		}
+
+		public int getLeftChildIdx() {
+			return leftChildIdx;
+		}
+
+		public int getRightChildIdx() {
+			return rightChildIdx;
+		}
+	}
+
+	private boolean exists(int idx) {
+		return idx >= 0 && idx < array.size();
+	}
+
+	private int compare(int idxA, int idxB) {
+		return array.get(idxA).getFrequency() - array.get(idxB).getFrequency();
+	}
+
+	private void swap(int a, int b) {
+		HuffmanTree.Node temp = array.get(a);
+		array.set( a, array.get(b) );
+		array.set( b, temp );
+	}
 	
 	/**
 	 * 	@param c : element that'll be pushed
@@ -47,63 +100,45 @@ public class MinHeap {
 
 		//fix Heap
 		//parent == (i-1)/2, left child == i*2+1, right child == i*2+2
-		for( int index = array.size() - 1; (index-1)/2 >= 0 && array.get(index).getFrequency() < array.get( (index-1)/2 ).getFrequency(); index = (index-1)/2 )
-			swap( index, (index-1)/2 );
+		for( int idx = array.size() - 1; (idx-1)/2 >= 0 && array.get(idx).getFrequency() < array.get( (idx-1)/2 ).getFrequency(); idx = (idx-1)/2 )
+			swap( idx, (idx-1)/2 );
+	}
+
+	private void fixDown(int itemIdx) {
+		ItemPointer current = new ItemPointer(itemIdx);
+
+		while(exists(current.getLeftChildIdx()) && compare(current.getIdx(), current.getLeftChildIdx()) > 0 || exists(current.getRightChildIdx()) && compare(current.getIdx(), current.getRightChildIdx()) > 0) {
+
+			if(exists(current.getLeftChildIdx()) && exists(current.getRightChildIdx())) {
+				if(compare(current.getLeftChildIdx(), current.getRightChildIdx()) < 0) {
+					swap(current.getIdx(), current.getLeftChildIdx());
+					current.setIdx(current.getLeftChildIdx());
+				}
+				else {
+					swap(current.getIdx(), current.getRightChildIdx());
+					current.setIdx(current.getRightChildIdx());
+				}
+				
+			}
+			else if(exists(current.getLeftChildIdx())) {
+				swap(current.getIdx(), current.getLeftChildIdx());
+				current.setIdx(current.getLeftChildIdx());
+			}
+			else {
+				swap(current.getIdx(), current.getRightChildIdx());
+				current.setIdx(current.getRightChildIdx());
+			}
+
+		}
 	}
 	
 	/**
 	 * 	Pops the least character from the Heap
 	 */
 	public void pop() {
-		swap( 0, array.size()-1 );
-		array.remove( array.size()-1 );
-		
-		//fixes the Heap
-		//parent == (i-1)/2, left child == i*2+1, right child == i*2+2
-		for( int index = 0; index*2 + 1 < array.size() && array.get(index).getFrequency() > array.get( index*2 + 1 ).getFrequency() || index*2 + 2 < array.size() && array.get(index).getFrequency() > array.get( index*2 + 2 ).getFrequency(); ) {
-			
-			//both children exist
-			if(index*2 + 1 < array.size() && index*2 + 2 < array.size()) {
-				
-				//right child is the least
-				if( array.get(index*2 + 1).getFrequency() < array.get(index*2 + 2).getFrequency() ) {
-					swap(index , index*2 + 1);
-					index = index*2 + 1;
-				}
-				
-				//left child is the least
-				else {
-					swap(index , index*2 + 2);
-					index = index*2 + 2;
-				}
-				
-			}
-			
-			//only the left child exists
-			else if(index*2 + 1 < array.size()) {
-				swap(index , index*2 + 1);
-				index = index*2 + 1;
-			}
-			
-			//only the right child exists
-			else {
-				swap(index , index*2 + 2);
-				index = index*2 + 2;
-			}
-
-		}
-	}
-	
-	
-	
-	/**
-	 * 	@param a : index of the first element
-	 * 	@param b : index of the second element
-	 */
-	private void swap(int a, int b) {
-		HuffmanTree.Node temp = array.get(a);
-		array.set( a, array.get(b) );
-		array.set( b, temp );
+		swap(0, array.size() - 1);
+		array.remove(array.size() - 1);
+		fixDown(0);
 	}
 	
 }
