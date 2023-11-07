@@ -84,6 +84,15 @@ public class MinHeap {
 		array.set( a, array.get(b) );
 		array.set( b, temp );
 	}
+
+	private void fixUp(int itemIdx) {
+		ItemPointer current = new ItemPointer(itemIdx);
+		
+		while(exists(current.getParentIdx()) && compare(current.getIdx(), current.getParentIdx()) < 0) {
+			swap(current.getIdx(), current.getParentIdx());
+			current.setIdx(current.getParentIdx());
+		}
+	}
 	
 	/**
 	 * 	@param c : element that'll be pushed
@@ -97,11 +106,7 @@ public class MinHeap {
 			temp = new HuffmanTree.Node(c);
 		
 		array.add(temp);
-
-		//fix Heap
-		//parent == (i-1)/2, left child == i*2+1, right child == i*2+2
-		for( int idx = array.size() - 1; (idx-1)/2 >= 0 && array.get(idx).getFrequency() < array.get( (idx-1)/2 ).getFrequency(); idx = (idx-1)/2 )
-			swap( idx, (idx-1)/2 );
+		fixUp(array.size() - 1);
 	}
 
 	private void fixDown(int itemIdx) {
