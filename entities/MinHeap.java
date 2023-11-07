@@ -21,14 +21,7 @@ public class MinHeap {
 	/**
 	 * 	@return Least character from the Heap
 	 */
-	public Character getMin() {
-		return (Character) array.get(0);
-	}
-	
-	/**
-	 * 	@return Least character from the Heap
-	 */
-	HuffmanTree.Node getMinNode() {
+	HuffmanTree.Node getMin() {
 		return array.get(0);
 	}
 
@@ -76,7 +69,7 @@ public class MinHeap {
 	}
 
 	private int compare(int idxA, int idxB) {
-		return array.get(idxA).getFrequency() - array.get(idxB).getFrequency();
+		return array.get(idxA).frequency - array.get(idxB).frequency;
 	}
 
 	private void swap(int a, int b) {
@@ -97,15 +90,16 @@ public class MinHeap {
 	/**
 	 * 	@param c : element that'll be pushed
 	 */
-	public void push(Character c) {
-		HuffmanTree.Node temp;
+	public void push(TextCharacter c) {
+		array.add(new HuffmanTree.Node(c));
+		fixUp(array.size() - 1);
+	}
 
-		if( c instanceof HuffmanTree.Node )
-			temp = (HuffmanTree.Node) c;
-		else
-			temp = new HuffmanTree.Node(c);
-		
-		array.add(temp);
+	/**
+	 * 	@param c : element that'll be pushed
+	 */
+	void push(HuffmanTree.Node n) {
+		array.add(n);
 		fixUp(array.size() - 1);
 	}
 
