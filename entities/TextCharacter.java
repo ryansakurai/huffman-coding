@@ -13,7 +13,7 @@ public class TextCharacter {
 	private final String character;
 	private String code;
 	private int frequency;
-	
+
 	/**
 	 * 	@param string : character(s) that'll be wrapped by the class
 	 * 	@throws InvalidCharacterException - if 'character' isn't a single character
@@ -23,6 +23,7 @@ public class TextCharacter {
 			throw new InvalidCharacterException();
 
 		this.character = character;
+		this.frequency = 1;
 	}
 
 	TextCharacter(HuffmanTree.Node node) throws InvalidCharacterException {
