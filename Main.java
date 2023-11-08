@@ -6,7 +6,8 @@ import java.util.TreeSet;
 import java.util.Comparator;
 import entities.MinHeap;
 import entities.HuffmanTree;
-import entities.Character;
+import entities.TextCharacter;
+import exceptions.InvalidCharacterException;
 
 /**
  * 	< Huffman Coding >
@@ -21,96 +22,90 @@ import entities.Character;
  */
 
 public class Main {
-	
-	public static void main(String[] args) throws IOException {
-		TreeSet<Character> textTree = new TreeSet<>( new TreeComparator() );
+
+	private static class TreeSetComparator implements Comparator<TextCharacter> {
+		@Override
+		public int compare(TextCharacter a, TextCharacter b) {
+			return a.toString().compareTo( b.toString() );
+		}
+	}
+
+
+
+	private static TreeSet<TextCharacter> readText() throws IOException, InvalidCharacterException {
+		TreeSet<TextCharacter> textTree = new TreeSet<>( new TreeSetComparator() );
 
 		System.out.printf("Input text:\n\n");
 		
 		InputStreamReader stream = new InputStreamReader(System.in);
 		BufferedReader reader = new BufferedReader(stream);
 
-		//reads text and stores the characters in the treeset of Character objects
 		for(int tempChar; ( tempChar = reader.read() ) != -1; ) {
-			Character tempNode = new Character( java.lang.Character.toString( (char) tempChar ) );
-			
-			Character tempFloor = textTree.floor( tempNode );
-			
-			//if the character is already in the treeset, +1 frequency is added
-			if( tempFloor != null && tempFloor.toString().equals( tempNode.toString() ) ) {
+			TextCharacter character = new TextCharacter( Character.toString( (char) tempChar ) );
+
+			TextCharacter tempFloor = textTree.floor( character );
+			if(tempFloor != null && tempFloor.toString().equals(character.toString()))
 				tempFloor.increaseFrequency();
-			}
-			
-			//if not, the node will be added to the treeset
-			else {
-				tempNode.increaseFrequency();
-				textTree.add( tempNode );
-			}
+			else
+				textTree.add( character );
 		}
 		
 		stream.close();
 		reader.close();
-		
-		//builds the heap with the elements from the treeset
+
+		return textTree;
+	}
+
+	private static MinHeap buildHeap(TreeSet<TextCharacter> textTree) {
 		MinHeap huffmanTreeHeap = new MinHeap();
-		while( !textTree.isEmpty() )
-			huffmanTreeHeap.push( textTree.pollFirst() );
-
-		//builds the Huffman tree using the Heap and extracts the leaves
-		HuffmanTree huffmanTree = new HuffmanTree(huffmanTreeHeap);
-		ArrayList<Character> huffmanTreeLeaves = huffmanTree.getCharacters();
-		huffmanTreeLeaves.sort( new ListComparator() );
-		
-		int totalFrequency = 0;
-		int qtBits = 0;
-		
-		System.out.println();
-		
-		//outputs code and frequency of each character and counts total frequency and quantity of bits
-		for(int i=0; i < huffmanTreeLeaves.size(); i++) {
-			switch( huffmanTreeLeaves.get(i).toString() ) {
-				case "\n":
-					System.out.printf( "%4s :\t%s - %,d occurances\n", "\"\\n\"", huffmanTreeLeaves.get(i).getCode(), huffmanTreeLeaves.get(i).getFrequency() );
-					break;
-
-				case "\r":
-					System.out.printf( "%4s :\t%s - %,d occurances\n", "\"\\r\"", huffmanTreeLeaves.get(i).getCode(), huffmanTreeLeaves.get(i).getFrequency() );
-					break;
-
-				case "\t":
-					System.out.printf( "%4s :\t%s - %,d occurances\n", "\"\\t\"", huffmanTreeLeaves.get(i).getCode(), huffmanTreeLeaves.get(i).getFrequency() );
-					break;
-
-				default:
-					System.out.printf( "%4s :\t%s - %,d occurances\n", String.format("\"%s\"", huffmanTreeLeaves.get(i)), huffmanTreeLeaves.get(i).getCode(), huffmanTreeLeaves.get(i).getFrequency() );
-					break;
-			}
-			
-			qtBits += huffmanTreeLeaves.get(i).getFrequency() * huffmanTreeLeaves.get(i).getCode().length();
-			totalFrequency += huffmanTreeLeaves.get(i).getFrequency();
-		}
-		
-		System.out.printf( "\nSize using Huffman Coding:\t   %,d bits\n", qtBits);
-		System.out.printf( "Size using regular Java encoding:  %,d bits\n\n", totalFrequency*16);
-	}
-
-	
-	
-
-	//comparator used in TreeSet
-	private static class TreeComparator implements Comparator<Character> {
-		@Override
-		public int compare(Character a, Character b) {
-			return a.toString().compareTo( b.toString() );
-		}
+		while(!textTree.isEmpty())
+			huffmanTreeHeap.push(textTree.pollFirst());
+		return huffmanTreeHeap;
 	}
 	
-	//comparator used in ArrayList sorting
-	private static class ListComparator implements Comparator<Character> {
+	private static class ArrayListComparator implements Comparator<TextCharacter> {
 		@Override
-		public int compare(Character a, Character b) {
+		public int compare(TextCharacter a, TextCharacter b) {
 			return b.getFrequency() - a.getFrequency();
 		}
 	}
 	
+	public static void main(String[] args) throws IOException, InvalidCharacterException {
+		TreeSet<TextCharacter> textTree = readText();
+		MinHeap huffmanTreeHeap = buildHeap(textTree);
+		HuffmanTree huffmanTree = new HuffmanTree(huffmanTreeHeap);
+		ArrayList<TextCharacter> huffmanTreeLeaves = huffmanTree.getLeaves();
+		huffmanTreeLeaves.sort(new ArrayListComparator());	// decrescent
+		
+		System.out.println();
+		
+		final int BITS_PER_UTF16_CHAR = 16;
+		int totalFrequency = 0;
+		int qtBits = 0;
+		
+		for(int i=0; i < huffmanTreeLeaves.size(); i++) {
+			TextCharacter character = huffmanTreeLeaves.get(i);
+			qtBits += character.getFrequency() * character.getCode().length();
+			totalFrequency += character.getFrequency();
+
+			switch(character.toString()) {
+				case "\n":
+					System.out.printf("%4s :\t%s - %,d occurances\n", "\"\\n\"", character.getCode(), character.getFrequency());
+					break;
+				case "\r":
+					System.out.printf("%4s :\t%s - %,d occurances\n", "\"\\r\"", character.getCode(), character.getFrequency());
+					break;
+				case "\t":
+					System.out.printf("%4s :\t%s - %,d occurances\n", "\"\\t\"", character.getCode(), character.getFrequency());
+					break;
+				default:
+					System.out.printf("%4s :\t%s - %,d occurances\n", String.format("\"%s\"", character), character.getCode(), character.getFrequency());
+					break;
+			}
+		}
+
+		System.out.printf("\nSize using Huffman Coding:\t   %,d bits\n", qtBits);
+		System.out.printf("Size using regular Java encoding:  %,d bits\n\n", totalFrequency * BITS_PER_UTF16_CHAR);
+	}
+
 }
