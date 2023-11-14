@@ -15,7 +15,7 @@ public class TextCharacter {
 	private int frequency;
 
 	/**
-	 * 	@param string : character(s) that'll be wrapped by the class
+	 * 	@param String : character(s) that'll be wrapped by the class
 	 * 	@throws InvalidCharacterException - if 'character' isn't a single character
 	 */
 	public TextCharacter(String character) throws InvalidCharacterException {

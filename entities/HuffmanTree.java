@@ -5,15 +5,10 @@ import java.util.ArrayList;
 import exceptions.InvalidCharacterException;
 
 /**
- * 	Huffman Tree
- * 
  * 	@author Ryan Sakurai
  */
 public class HuffmanTree {
 
-	/**
-	 * 	Class that extends Character into a HuffmanTree node
-	 */
 	static class Node {
 		public final String subString;
 		public String code;
@@ -42,7 +37,7 @@ public class HuffmanTree {
 	 * 	@param h : heap with all the characters from the text
 	 */
 	public HuffmanTree(MinHeap h) {
-		while(h.getQuantity() > 1) {
+		while(h.getSize() > 1) {
 			Node child1 = h.getMin();
 			h.pop();
 			
@@ -92,7 +87,7 @@ public class HuffmanTree {
 			getLeavesPrivate(leaves, "", this.root, "");
 		}
 		catch(InvalidCharacterException e) {
-			System.out.println("Error not supposed to happen, check code if it does.");
+			e.printStackTrace();;
 		}
 		return leaves;
 	}

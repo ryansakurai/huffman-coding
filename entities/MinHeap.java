@@ -3,7 +3,7 @@ package entities;
 import java.util.ArrayList;
 
 /**
- * 	Heap that stores Huffman Tree nodes
+ * 	Heap used to build a Huffman tree
  * 
  * 	@author Ryan Sakurai
  */
@@ -11,16 +11,10 @@ public class MinHeap {
 
 	private final ArrayList<HuffmanTree.Node> array = new ArrayList<>();
 	
-	/**
-	 * 	@return Quantity of elements in the Heap
-	 */
-	public int getQuantity() {
+	public int getSize() {
 		return array.size();
 	}
 	
-	/**
-	 * 	@return Least character from the Heap
-	 */
 	HuffmanTree.Node getMin() {
 		return array.get(0);
 	}
@@ -87,17 +81,11 @@ public class MinHeap {
 		}
 	}
 	
-	/**
-	 * 	@param c : element that'll be pushed
-	 */
 	public void push(TextCharacter c) {
 		array.add(new HuffmanTree.Node(c));
 		fixUp(array.size() - 1);
 	}
 
-	/**
-	 * 	@param c : element that'll be pushed
-	 */
 	void push(HuffmanTree.Node n) {
 		array.add(n);
 		fixUp(array.size() - 1);
