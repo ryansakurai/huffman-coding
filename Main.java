@@ -4,6 +4,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.TreeSet;
 import java.util.Comparator;
+
 import entities.MinHeap;
 import entities.HuffmanTree;
 import entities.TextCharacter;
@@ -26,32 +27,31 @@ public class Main {
 	private static class TreeSetComparator implements Comparator<TextCharacter> {
 		@Override
 		public int compare(TextCharacter a, TextCharacter b) {
-			return a.toString().compareTo( b.toString() );
+			return a.toString().compareTo(b.toString());
 		}
 	}
 
-
-
-	private static TreeSet<TextCharacter> readText() throws IOException, InvalidCharacterException {
-		TreeSet<TextCharacter> textTree = new TreeSet<>( new TreeSetComparator() );
+	private static TreeSet<TextCharacter> readText() {
+		TreeSet<TextCharacter> textTree = new TreeSet<>(new TreeSetComparator());
 
 		System.out.printf("Input text:\n\n");
-		
-		InputStreamReader stream = new InputStreamReader(System.in);
-		BufferedReader reader = new BufferedReader(stream);
 
-		for(int tempChar; ( tempChar = reader.read() ) != -1; ) {
-			TextCharacter character = new TextCharacter( Character.toString( (char) tempChar ) );
-
-			TextCharacter tempFloor = textTree.floor( character );
-			if(tempFloor != null && tempFloor.toString().equals(character.toString()))
-				tempFloor.increaseFrequency();
-			else
-				textTree.add( character );
+		try(BufferedReader reader = new BufferedReader(new InputStreamReader(System.in))) {
+			for(int tempChar; ( tempChar = reader.read() ) != -1; ) {
+				TextCharacter character = new TextCharacter(Character.toString((char) tempChar));
+				TextCharacter floorInTree = textTree.floor(character);
+				if(floorInTree != null && floorInTree.toString().equals(character.toString()))
+					floorInTree.increaseFrequency();
+				else
+					textTree.add(character);
+			}
 		}
-		
-		stream.close();
-		reader.close();
+		catch(IOException e) {
+			e.printStackTrace();
+		}
+		catch(InvalidCharacterException e) {
+			e.printStackTrace();
+		}
 
 		return textTree;
 	}
@@ -63,19 +63,19 @@ public class Main {
 		return huffmanTreeHeap;
 	}
 	
-	private static class ArrayListComparator implements Comparator<TextCharacter> {
+	private static class ListDecrescentComparator implements Comparator<TextCharacter> {
 		@Override
 		public int compare(TextCharacter a, TextCharacter b) {
 			return b.getFrequency() - a.getFrequency();
 		}
 	}
 	
-	public static void main(String[] args) throws IOException, InvalidCharacterException {
+	public static void main(String[] args) {
 		TreeSet<TextCharacter> textTree = readText();
 		MinHeap huffmanTreeHeap = buildHeap(textTree);
 		HuffmanTree huffmanTree = new HuffmanTree(huffmanTreeHeap);
 		ArrayList<TextCharacter> huffmanTreeLeaves = huffmanTree.getLeaves();
-		huffmanTreeLeaves.sort(new ArrayListComparator());	// decrescent
+		huffmanTreeLeaves.sort(new ListDecrescentComparator());
 		
 		System.out.println();
 		
@@ -83,11 +83,9 @@ public class Main {
 		int totalFrequency = 0;
 		int qtBits = 0;
 		
-		for(int i=0; i < huffmanTreeLeaves.size(); i++) {
-			TextCharacter character = huffmanTreeLeaves.get(i);
+		for(TextCharacter character: huffmanTreeLeaves) {
 			qtBits += character.getFrequency() * character.getCode().length();
 			totalFrequency += character.getFrequency();
-
 			switch(character.toString()) {
 				case "\n":
 					System.out.printf("%4s :\t%s - %,d occurances\n", "\"\\n\"", character.getCode(), character.getFrequency());
@@ -103,7 +101,6 @@ public class Main {
 					break;
 			}
 		}
-
 		System.out.printf("\nSize using Huffman Coding:\t   %,d bits\n", qtBits);
 		System.out.printf("Size using regular Java encoding:  %,d bits\n\n", totalFrequency * BITS_PER_UTF16_CHAR);
 	}
