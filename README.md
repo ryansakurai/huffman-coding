@@ -1,4 +1,4 @@
-## Huffman Coding
+<h1 align="center"> 🌳 Huffman Coding 🌳 </h1>
 
 Huffman Coding is a technique commonly used for lossless data compression. It consists in atributing smaller codes to characters that appear more frequently in a text and bigger ones to characters that appear less frequently, which means it uses variable-lenght codes. It also uses prefix codes, so the fact that no code is the prefix of another code assures there's no ambiguity when decoding data.
 
